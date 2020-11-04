@@ -11,25 +11,30 @@
 // 作用域是指代码中定义变量的区域
 // js采用的是静态作用域, 也就是函数定义时决定的
 
-
 // var scope = "global scope";
-// function checkscope(){
+// var test = "test";
+// function checkscope() {
 //     var scope = "local scope";
-//     function f(){
-//         return scope;
+//     function f() {
+//         console.log(scope, test)
 //     }
-//     return f();
+//     // var scope = "local scope";
+//     f();
+//     // var scope = "local scope";
 // }
 // checkscope();
-// var scope = "global scope";
-// function checkscope(){
-//     var scope = "local scope";
-//     function f(){
-//         return scope;
-//     }
-//     return f;
-// }
-// checkscope()(); 
+
+var scope = "global scope";
+var test = "test";
+function checkscope() {
+    var scope = "local scope";
+    function f() {
+        console.log(scope, test)
+    }
+    return f;
+}
+checkscope()();
+
 // 打印是相同的, 但是又有些不同
 
 // 第一个
@@ -59,7 +64,7 @@
 // foo(); // foo2
 
 
-// 函数调用的时候js引擎创建执行上下文栈来管理执行上下文
+// 函数调用的时候js引擎创建执行上下文栈来管理执行上下文 (Execution context stack，ECS)
 
 //定义一个执行上下文栈
 // var ECStack = []
@@ -86,12 +91,13 @@
 // ECStack.pop()
 
 // 每一个执行上下文有三个重要属性 
-// 1.变量对象(variable object VO)
+// 一.变量对象(variable object VO)
 // ①全局上下文中的变量对象就是全局对象 window
 // var a = 2
 // console.log(window.a)
 
-// ②函数上下文中用 活动对象(activation object AO)来表示变量对象
+// ②函数上下文中用 活动对象(activation object AO)来表示变量对象 AO = VO + function parameters + arguments
+// 变量对象包括
 // Ⅰ: 函数的所有形参 (如果是函数上下文)
 // Ⅱ: 函数声明
 // Ⅲ: 变量声明
@@ -104,7 +110,7 @@
 // }
 // foo(1);
 
-// 创建阶段
+// 进入执行上下文
 // AO = {
 //     a: 1,
 //     b: undefined,
@@ -144,17 +150,100 @@
 
 // var foo = 1;
 // console.log(foo);
-// function foo(){
+// function foo() {
 //     console.log("foo");
 // }
 
 // console.log(foo);
-// var foo = 1;
-// function foo(){
+// function foo() {
 //     console.log("foo");
 // }
+// var foo = 1;
 
-// 2.作用域链
+// var x = 1;
+// if(function f(){}){
+//     x += typeof f;
+// }
+// console.log(x); // 1undeifned
+
+// 二.作用域链 (Scope)
+// 函数的作用域在函数定义的时候就决定了 ! 
+// 这是因为函数有一个内部属性 [[scope]]，当函数创建的时候，就会保存所有父变量对象到其中
+// function foo() {
+//     var a = 1
+//     function bar() {
+//         console.log(a)
+//     }
+// }
+// 函数创建
+// foo[scope] = [
+//     globalContext.AO
+// ]
+// bar[scope] = [
+//     fooContext.AO,
+//     globalContext.AO
+// ]
+
+//函数激活时, 进入执行上下文，创建 VO/AO 后，就会将活动对象添加到作用链的前端。
+// Scope = [AO].concat([Scope])
+
+// 例子
+// var scope = "global scope";
+// function checkscope() {
+//     var scope2 = 'local scope';
+//     return scope2;
+// }
+// checkscope();
+
+// // 1.checkscope 函数被创建,保存作用域链到内部属性 scope
+// checkscope[scope] = [
+//     globalContext.VO
+// ]
+// // 2.执行函数, 创建checkscope函数执行上下文
+// EStack = [
+//     checkscopeContext,
+//     globalContext,
+// ]
+// // 3. 复制作用域链
+// checkscopeContext = {
+//     Scope: checkscope[scope]
+// }
+// // 4. 初始化AO
+// checkscopeContext = {
+//     AO: {
+//         arguments: {
+//             length: 0
+//         },
+//         scope2: undefined
+//     },
+//     Scope: checkscope[scope]
+// }
+// // 5.将活动对象压入 checkscope 作用域链顶端
+// checkscopeContext = {
+//     AO: {
+//         arguments: {
+//             length: 0
+//         },
+//         scope2: undefined
+//     },
+//     Scope: [AO, [Scope]]
+// }
+// // 6. 开始执行, 修改AO的属性值
+// checkscopeContext = {
+//     AO: {
+//         arguments: {
+//             length: 0
+//         },
+//         scope2: 'local scope'
+//     },
+//     Scope: [AO, [Scope]]
+// }
+// // 7.执行完毕
+// ECStack = [
+//     globalContext
+// ];
+
+// 总结: 函数在定义的时候会确定作用域链, 但是在执行阶段才会把变量赋值
 
 
-// 3.this
+// 三.this
