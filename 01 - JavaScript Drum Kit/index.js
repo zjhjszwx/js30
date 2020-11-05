@@ -14,26 +14,27 @@
 // var scope = "global scope";
 // var test = "test";
 // function checkscope() {
-//     var scope = "local scope";
+//     // var scope = "local scope";
 //     function f() {
 //         console.log(scope, test)
 //     }
 //     // var scope = "local scope";
 //     f();
+//     // function scope () { }
 //     // var scope = "local scope";
 // }
 // checkscope();
 
-var scope = "global scope";
-var test = "test";
-function checkscope() {
-    var scope = "local scope";
-    function f() {
-        console.log(scope, test)
-    }
-    return f;
-}
-checkscope()();
+// var scope = "global scope";
+// var test = "test";
+// function checkscope() {
+//     var scope = "local scope";
+//     function f() {
+//         console.log(scope, test)
+//     }
+//     return f;
+// }
+// checkscope()();
 
 // 打印是相同的, 但是又有些不同
 
@@ -204,11 +205,11 @@ checkscope()();
 //     checkscopeContext,
 //     globalContext,
 // ]
-// // 3. 复制作用域链
+// // 3.函数并不立刻执行，开始做准备工作，第一步：复制函数[[scope]]属性创建作用域链
 // checkscopeContext = {
 //     Scope: checkscope[scope]
 // }
-// // 4. 初始化AO
+// // 4.初始化AO
 // checkscopeContext = {
 //     AO: {
 //         arguments: {
@@ -247,3 +248,109 @@ checkscope()();
 
 
 // 三.this
+// 1.默认绑定 非严格模式下指向window
+// function Person() {
+//     console.log(this)
+// }
+// console.log(Person())
+
+// 2.隐式绑定 指向该对象
+// var obj = {
+//     a: 1,
+//     foo: function () {
+//         console.log(this, this.a)
+//     }
+// }
+// console.log(obj.foo())
+
+// 3. 显示绑定(apply)
+// var obj = {
+//   a: 1
+// }
+// function foo(something) {
+//   console.log(this, this.a, something);
+//   return this.a + something
+// }
+// foo.apply(obj, [2, 3])
+
+//4. new 绑定
+// var Person = function () {
+//   this.name = "jock"
+//   console.log(this)
+// }
+// var a = new Person()
+// console.log(this.name)
+
+
+// 闭包
+// var data = []
+// for (var i = 0; i < 3; i++) {
+//   data[i] = (function (i) {
+//     return () => {
+//       console.log(i)
+//     }
+//   })(i)
+// }
+// console.log(data)
+// data[0]()
+// data[1]()
+// data[2]()
+
+//例子
+// var fn = null;
+// function foo() {
+//     var a = 2;
+//     function innnerFoo() { 
+//         console.log(c); // ???
+//         console.log(a);
+//     }
+//     fn = innnerFoo; 
+// }
+
+// function bar() {
+//     var c = 100;
+//     fn(); 
+// }
+
+// foo();
+// bar();
+
+// call 用指定的this值来调用一个函数
+
+// Function.prototype.call2 = function (context, ...args) {
+//   // console.log(this, context, args);
+//   var context = context || window
+//   //this指向调用该函数的函数
+//   context.fn = this;
+//   var res = context.fn(...args);
+//   delete context.fn
+//   return res
+// }
+// function Product(name, price) {
+//   this.name = name;
+//   this.price = price;
+//   console.log('Product....')
+// }
+// function Food(name, price) {
+//   Product.call2(this, name, price);
+//   this.category = 'food';
+// }
+// console.log(new Food('cheese', 5).name);
+
+// var value = 2;
+// var obj = {
+//     value: 1
+// }
+// function bar(name, age) {
+//     console.log(this.value);
+//     return {
+//         value: this.value,
+//         name: name,
+//         age: age
+//     }
+// }
+// bar.call2(null); // 2
+// console.log(bar.call2(obj, 'kevin', 18));
+
+
+
