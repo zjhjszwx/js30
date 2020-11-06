@@ -352,5 +352,32 @@
 // bar.call2(null); // 2
 // console.log(bar.call2(obj, 'kevin', 18));
 
+// bind
 
+Function.prototype.bind2 = function (context, ...args) {
+  // console.log(this, args);
+  const self = this
+  return (...obj) => {
+    // console.log(arguments)
+    self.apply(context, [...args, ...obj])
+  }
+}
+
+var foo = {
+  a: 2,
+}
+function bar(name, age) {
+  this.habit = 'shopping';
+  console.log(this.a)
+  console.log(name)
+  console.log(age)
+}
+bar.prototype.friend = 'kevin';
+var bindFoo = bar.bind2(foo, 'daisy');
+// bindFoo('18');
+
+// 当bing返回的函数作为构造函数的时候, bind绑定的this会失效
+var obj = new bindFoo('18');
+console.log(obj.habit);
+console.log(obj.friend);
 
