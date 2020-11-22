@@ -114,3 +114,46 @@
 // console.log(person.strength) // 60
 
 // person.sayYourName(); // I am Kevin
+
+
+
+// js 模拟 call apply
+// 定义 用指定的this值来调用一个函数
+
+function Product(name, price) {
+  this.name = name;
+  this.price = price;
+}
+// function Food(name, price) {
+//   Product.call(this, name, price);
+//   this.category = 'food';
+// }
+
+// console.log(new Food('cheese', 5).name);
+// // expected output: "cheese"
+
+//第一种方式
+// // 用指定的this值来调用一个函数, 在Food中调用 Product, 这样返回的值肯定会有name 和 price属性
+// function Food(name, price) {
+//   this.call1(name, price)
+//   this.catagory = 'food'
+// }
+// Food.prototype.call1 = Product
+// console.log(new Food('cheese', 5).name)
+
+// 但是这种方法有个问题, 每次都需要重新赋值call1
+
+// 第二种方式 
+function Food(name, price) {
+  Product.apply2(this, [name, price]);
+  this.catagory = 'food'
+}
+Function.prototype.apply2 = function () {
+  const context = arguments[0];
+  var args = arguments[1];
+  context.fn = this
+  context.fn(...args)
+  delete context.fn
+}
+
+console.log(new Food('cheese', 5).name)
