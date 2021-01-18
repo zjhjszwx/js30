@@ -37,19 +37,25 @@ function flatten2(arr) {
  * @param {array} output   为了方便递归而传递的参数
  */
 function flatten3(input, shallow, strict, output) {
-  let output = output || [];
+  output = output || [];
 
   for (let i = 0; i < input.length; i++) {
     const value = input[i];
     if (Array.isArray(value)) {
       if (shallow) {
-      } else {
+        var j = 0, len = value.length
+        while(j < len) {
+          output.push(value[j++])
+        }
+      } else {  
+        flatten3(value, shallow, strict, output)
       }
+    }else {
+      output.push(value)
     }
   }
   return output;
 }
 
-//underscore在数组中查找指定元素
-console.log(flatten3([1, [2, [3, 4]], 5], false, false)); // [ 1, 2, 3, 4, 5 ]
-console.log(flatten3([1, [2, [3, 4]], 5], true, false)); // [ 1, 2, [ 3, 4 ] ] 这里与 underscore 不一致
+// console.log(flatten3([1, [2, [3, 4]], 5], false, false)); // [ 1, 2, 3, 4, 5 ]
+// console.log(flatten3([1, [2, [3, 4]], 5], true, false)); // [ 1, 2, [ 3, 4 ] ] 这里与 underscore 不一致
